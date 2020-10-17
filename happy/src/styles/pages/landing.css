@@ -44,6 +44,10 @@
     background-size: 500px;
 }
 
+.content-wrapper .location strong {
+    font-weight: 800;
+}
+
 .content-wrapper .location{
     position: absolute;
     right: 0;
@@ -54,8 +58,8 @@
 
     font-size: 24px;
     line-height: 34px;
+    
     text-align: right;
-    font-weight: 800;
 }
 
 .content-wrapper .enter-app{
