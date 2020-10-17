@@ -5,6 +5,7 @@ import { RectButton } from 'react-native-gesture-handler';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import api from '../../services/api';
+import { TextInputMask } from 'react-native-masked-text'
 
 interface OrphanageDataRouteParams{
   position: {
@@ -85,7 +86,8 @@ export default function OrphanageData() {
       <Text style={styles.label}>Sobre</Text>
       <TextInput style={[styles.input, { height: 110 }]} multiline value={about} onChangeText={about => setAbout(about)}></TextInput>
       <Text style={styles.label}>Número de Whatsapp</Text>
-      <TextInput style={styles.input} value={whatsappNumber} onChangeText={whatsappNumber => setWhatsappNumber(whatsappNumber)}></TextInput>
+      {/* <TextInput style={styles.input} value={whatsappNumber} onChangeText={whatsappNumber => setWhatsappNumber(whatsappNumber)}></TextInput> */}
+      <TextInputMask style={styles.input} type={'custom'} options={{ maskType: 'BRL', mask: '+55 (99) 99999-9999'}} value={whatsappNumber} onChangeText={whatsappNumber => setWhatsappNumber(whatsappNumber)}></TextInputMask>
       <Text style={styles.label}>Fotos</Text>
       <View style={styles.uploadedImagesContainer}>
         {images.map(img => {
