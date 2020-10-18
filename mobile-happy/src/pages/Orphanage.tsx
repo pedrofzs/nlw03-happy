@@ -39,7 +39,7 @@ export default function Orphanage() {
 
   if (!orphanage){
       return (
-               <ActivityIndicator style={styles.loading} size="large" color="#2AB5D1"></ActivityIndicator> // no lugar de retornar a View com Text 'Carregando...'
+               <ActivityIndicator style={styles.loading} size="large" color="#2AB5D1"></ActivityIndicator>
       )
   }
 
