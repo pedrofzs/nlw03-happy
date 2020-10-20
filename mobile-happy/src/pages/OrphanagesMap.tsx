@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { StyleSheet, Text, View, Dimensions } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import MapView, { Marker, Callout, PROVIDER_GOOGLE } from 'react-native-maps';
@@ -70,7 +70,7 @@ export default function OrphanagesMap(){
                         {orphanages.length} orfanato(s) encontrado(s)!
                     </Text>
                     <RectButton style={styles.createOrphanageButton} onPress={handleNavigateToCreateOrphanage}>
-                    <Feather name="plus" size={20} color="#FFF"></Feather>
+                        <Feather name="plus" size={20} color="#FFF"></Feather>
                     </RectButton>
                 </View>
                 </View>

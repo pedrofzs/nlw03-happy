@@ -28,7 +28,7 @@ export default function Splash() {
 
     useEffect(() => {
         setTimeout(() => {
-            navigation.navigate("OrphanagesMap");
+            navigation.navigate("OnboardingScreen");
         }, 5000);
         }
     )
@@ -60,8 +60,8 @@ const styles = StyleSheet.create({
         position: "absolute",
         width: 180,
         height: 162.76,
-        left: 97,
-        top: 287
+        left: 90,
+        top: 250
     },
 
     locationState: {
@@ -83,8 +83,8 @@ const styles = StyleSheet.create({
     location: {
         position: "absolute",
 
-        top: 550,
-        left: 125,
+        top: 490,
+        left: 123,
 
         display: "flex",
         flexDirection: "column",
