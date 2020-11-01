@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Text, View, StyleSheet, Image } from 'react-native';
+import { Text, View, StyleSheet, Image, Dimensions } from 'react-native';
 import {LinearGradient} from 'expo-linear-gradient';
 import logo from '../images/logo.png';
 import { useNavigation } from '@react-navigation/native';
@@ -34,34 +34,34 @@ export default function Splash() {
     )
 
     return (
-        <View style={styles.splashContainer}>
-            <LinearGradient colors={['#2AB5D1', '#00C7C7']} start={{x: 0, y: 0}} style={{ flex:1 }}></LinearGradient>
-            <Image style={styles.logo} source={logo}></Image>
-            <View style={styles.location}>
-                <Text style={styles.locationState}>
-                    {location.state}
-                </Text>
-                <Text style={styles.locationCity}>
-                    {location.city}
-                </Text>
-            </View>
-        </View>
+            <LinearGradient colors={['#2AB5D1', '#00C7C7']} style={styles.splashContainer}>
+                <Image style={styles.logo} source={logo}></Image>
+                <View style={styles.location}>
+                    <Text style={styles.locationState}>
+                        {location.state}
+                    </Text>
+                    <Text style={styles.locationCity}>
+                        {location.city}
+                    </Text>
+                </View>
+            </LinearGradient>
     )
 }
     
 const styles = StyleSheet.create({
     splashContainer: {
-        position: "relative",
-        width: 375,
-        height: 812,
+        position: 'relative',
+        width: Dimensions.get('screen').width,
+        height: Dimensions.get('screen').height,
+
+        justifyContent: 'center',
+        alignItems: 'center'
     },
 
     logo:{
-        position: "absolute",
         width: 180,
-        height: 162.76,
-        left: 90,
-        top: 250
+        height: 162.76,  
+        alignSelf: 'center'
     },
 
     locationState: {
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
         position: "absolute",
 
         top: 490,
-        left: 123,
+        alignSelf: 'center',
 
         display: "flex",
         flexDirection: "column",

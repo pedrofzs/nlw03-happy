@@ -4,8 +4,9 @@ import { useNavigation } from '@react-navigation/native';
 import Onboarding from 'react-native-onboarding-swiper';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Feather } from '@expo/vector-icons';
-//import onboarding01 from '../images/onboarding-01.png';
-//import onboarding02 from '../images/onboarding-02.png';
+import OrphanagesMap from './OrphanagesMap';
+import onboarding01 from '../images/onboarding-01.png';
+import onboarding02 from '../images/onboarding-02.png';
 
 export interface DotProps {
     selected: boolean;
@@ -14,9 +15,9 @@ export interface DotProps {
 
 export default function Onboardings() {
     const navigation = useNavigation();
-    const [isFirstLaunch, setIsFirstLaunch] = useState(false);
+    const [isFirstLaunch, setIsFirstLaunch] = useState(true);
 
-    useEffect(() => {
+/*     useEffect(() => {
         AsyncStorage.getItem('alreadyLaunched').then(value => {
             if (!value){
                 AsyncStorage.setItem('alreadyLaunched', 'true');
@@ -25,7 +26,17 @@ export default function Onboardings() {
                 setIsFirstLaunch(false);
             }
         })
-    }, []);
+    }, []); */
+
+    useEffect(() => {
+        const asyncStorage = async () => {
+            try {
+                const check = await AsyncStorage.getItem('alreadyLaunched');
+                setIsFirstLaunch(!(check === 'true'));
+            } catch (e) {}
+        }
+        asyncStorage();
+    }, [setIsFirstLaunch]);
 
     const Square = ({ ...props }) => {
         if (props.selected){
@@ -55,39 +66,39 @@ export default function Onboardings() {
         </View>
     ); 
 
-    /*if (!isFirstLaunch) {
-        return null;
-    }*/
-
-    return (
-                <Onboarding containerStyles={{ marginTop: 30, justifyContent: "space-between"}} onDone={() => navigation.navigate("Instructions")} 
-                    DotComponent={Square}
-                    NextButtonComponent={Next}
-                    DoneButtonComponent={Done}
-                    showSkip = {false}
-                    bottomBarColor = "#F2F3F5"
-                    pages={[
-                        {
-                            backgroundColor: '#F2F3F5',
-                            image: <Image source={require('../images/onboarding-01.png')}></Image>,
-                            title: <View style={styles.onboardingScreen1TitleContainer}>
-                                        <Text style={styles.onboardingScreen1Title}>Leve felicidade para o mundo</Text>
-                                </View>,
-                            subtitle: <View style={styles.onboardingScreen1SubtitleContainer}>
-                                        <Text style={styles.onboardingScreen1Subtitle}>Visite orfanatos e mude o dia de muitas crianças.</Text>
-                                    </View>
-                        },
-                        {
-                            backgroundColor: '#F2F3F5',
-                            image: <Image source={require('../images/onboarding-02.png')}></Image>,
-                            title: <View style={styles.onboardingScreen2TitleContainer}>
-                                        <Text style={styles.onboardingScreen2Title}>Escolha um orfanato no mapa e faça uma visita</Text>
-                                </View>,
-                            subtitle: ''
-                        }
-                    ]}>
-                </Onboarding> 
-    )
+    if (!isFirstLaunch) {        
+        return <OrphanagesMap></OrphanagesMap>;
+    } else {        
+        return (
+                    <Onboarding containerStyles={{ marginTop: 30, justifyContent: "space-between"}} onDone={() => { AsyncStorage.setItem('alreadyLaunched', 'true'); navigation.navigate("Instructions") }} 
+                        DotComponent={Square}
+                        NextButtonComponent={Next}
+                        DoneButtonComponent={Done}
+                        showSkip = {false}
+                        bottomBarColor = "#F2F3F5"
+                        pages={[
+                            {
+                                backgroundColor: '#F2F3F5',
+                                image: <Image source={onboarding01}></Image>,
+                                title: <View style={styles.onboardingScreen1TitleContainer}>
+                                            <Text style={styles.onboardingScreen1Title}>Leve felicidade para o mundo</Text>
+                                       </View>,
+                                subtitle: <View style={styles.onboardingScreen1SubtitleContainer}>
+                                            <Text style={styles.onboardingScreen1Subtitle}>Visite orfanatos e mude o dia de muitas crianças.</Text>
+                                          </View>
+                            },
+                            {
+                                backgroundColor: '#F2F3F5',
+                                image: <Image source={onboarding02}></Image>,
+                                title: <View style={styles.onboardingScreen2TitleContainer}>
+                                            <Text style={styles.onboardingScreen2Title}>Escolha um orfanato no mapa e faça uma visita</Text>
+                                       </View>,
+                                subtitle: ''
+                            }
+                        ]}>
+                    </Onboarding> 
+        )
+    }
 }
     
 const styles = StyleSheet.create({

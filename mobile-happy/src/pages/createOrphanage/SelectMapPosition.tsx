@@ -37,7 +37,6 @@ export default function SelectMapPosition() {
 
   return (
     <View style={styles.container}>
-      {/* <MapView initialRegion={{ latitude: -22.9249271, longitude: -43.2472064, latitudeDelta: 0.008, longitudeDelta: 0.008 }} style={styles.mapStyle} onPress={handleSelectMapPosition}> */}
       <MapView region={{ latitude: userPosition.latitude, longitude: userPosition.longitude, latitudeDelta: 0.008, longitudeDelta: 0.008 }} style={styles.mapStyle} onPress={handleSelectMapPosition}>
         {position.latitude !== 0 ? (
                                     <Marker icon={mapMarkerImg} coordinate={{ latitude: position.latitude, longitude: position.longitude }}></Marker>

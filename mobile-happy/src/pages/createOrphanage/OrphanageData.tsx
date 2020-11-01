@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
-import { ScrollView, View, StyleSheet, Switch, Text, TextInput, TouchableOpacity, Image } from 'react-native';
+import React, { useContext, useEffect, useState } from 'react';
+import { ScrollView, View, StyleSheet, Text, TextInput, TouchableOpacity, Image } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { RectButton } from 'react-native-gesture-handler';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
-import api from '../../services/api';
 import { TextInputMask } from 'react-native-masked-text'
+import { OrphanageContext, OrphanageContextProvider } from '../../components/Context';
+import {LinearGradient} from 'expo-linear-gradient';
 
 interface OrphanageDataRouteParams{
   position: {
@@ -18,41 +19,20 @@ export default function OrphanageData() {
   const navigation = useNavigation();
   const route = useRoute();
   const params = route.params as OrphanageDataRouteParams;
+  const context = useContext(OrphanageContext);
+  const { latitude, longitude } = params.position;
   
   const [name, setName] = useState("");
   const [about, setAbout] = useState("");
   const [whatsappNumber, setWhatsappNumber] = useState("");
-  const [instructions, setInstructions] = useState("");
-  const [openingHours, setOpeningHours] = useState("");
-  const [openOnWeekend, setOpenOnWeekend] = useState(true);
   const [images, setImages] = useState<string[]>([]);
-  const [previewImages, setPreviewImages] = useState<string[]>([]);
+  const [opacity, setOpacity] = useState(0.5);
 
-  async function handleCreateOrphanage(){
-    const { latitude, longitude } = params.position;
-    
-    const data = new FormData();
-
-    data.append('name', name);
-    data.append('about', about);
-    data.append('whatsappNumber', whatsappNumber);
-    data.append('latitude', String(latitude));
-    data.append('longitude', String(longitude));
-    data.append('instructions', instructions);
-    data.append('openingHours', openingHours);
-    data.append('openOnWeekend', String(openOnWeekend));
-    images.forEach((image, index) => {
-      data.append('images', {
-          type: "image/jpg",
-          uri: image,
-          name: `image_${index}.jpg`
-      } as any);
-    });
-
-   await api.post("orphanages", data);
-
-   navigation.navigate("OrphanagesMap");
-
+  async function handleNextStage(){
+    if(opacity === 1){
+      context.updateOrph(name, about, whatsappNumber, latitude, longitude, images); 
+      navigation.navigate("OrphanageData2");
+    }
   }
   
   async function handleSelectImages(){
@@ -76,42 +56,59 @@ export default function OrphanageData() {
     const { uri: imageUrl } = result;
 
     setImages([...images, imageUrl]);
+
   }
 
+  function handleRemoveImage(selectedImage: string){
+    const imagesAfterRemoved = images.filter((img, imgId) => imgId !== images.indexOf(selectedImage));
+    setImages(imagesAfterRemoved);
+  }
+
+    function handleOpacity(){
+      if (name !== '' && about !== '' && whatsappNumber !== ''){
+          setOpacity(1);
+      } else {
+          setOpacity(0.5);
+      }
+  }
+
+  useEffect(() => {
+      handleOpacity();
+  }, [handleOpacity])
+
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ padding: 24 }}>
-      <Text style={styles.title}>Dados</Text>
-      <Text style={styles.label}>Nome</Text>
-      <TextInput style={styles.input} value={name} onChangeText={text => setName(text)}></TextInput>
-      <Text style={styles.label}>Sobre</Text>
-      <TextInput style={[styles.input, { height: 110 }]} multiline value={about} onChangeText={about => setAbout(about)}></TextInput>
-      <Text style={styles.label}>Número de Whatsapp</Text>
-      {/* <TextInput style={styles.input} value={whatsappNumber} onChangeText={whatsappNumber => setWhatsappNumber(whatsappNumber)}></TextInput> */}
-      <TextInputMask style={styles.input} type={'custom'} options={{ maskType: 'BRL', mask: '+55 (99) 99999-9999'}} value={whatsappNumber} onChangeText={whatsappNumber => setWhatsappNumber(whatsappNumber)}></TextInputMask>
-      <Text style={styles.label}>Fotos</Text>
-      <View style={styles.uploadedImagesContainer}>
-        {images.map(img => {
-            return (
-                    <Image key={img} source={{uri: img }} style={styles.uploadedImage}></Image>
-            )
-        })}
-      </View>
-      <TouchableOpacity style={styles.imagesInput} onPress={handleSelectImages}>
-        <Feather name="plus" size={24} color="#15B6D6"></Feather>
-      </TouchableOpacity>
-      <Text style={styles.title}>Visitação</Text>
-      <Text style={styles.label}>Instruções</Text>
-      <TextInput style={[styles.input, { height: 110 }]} multiline value={instructions} onChangeText={instructions => setInstructions(instructions)}></TextInput>
-      <Text style={styles.label}>Horario de Visitação</Text>
-      <TextInput style={styles.input} value={openingHours} onChangeText={openingHours => setOpeningHours(openingHours)}></TextInput>
-      <View style={styles.switchContainer}>
-        <Text style={styles.label}>Atende final de semana</Text>
-        <Switch thumbColor="#fff" trackColor={{ false: '#ccc', true: '#39CC83' }} value={openOnWeekend} onValueChange={setOpenOnWeekend}></Switch>
-      </View>
-      <RectButton style={styles.nextButton} onPress={handleCreateOrphanage}>
-        <Text style={styles.nextButtonText}>Confirmar</Text>
-      </RectButton>
-    </ScrollView>
+    <OrphanageContextProvider>
+      <ScrollView style={styles.container} contentContainerStyle={{ padding: 24 }}>
+        <Text style={styles.title}>Dados</Text>
+        <Text style={styles.label}>Nome</Text>
+        <TextInput style={styles.input} value={name} onChangeText={text => setName(text)}></TextInput>
+        <Text style={styles.label}>Sobre</Text>
+        <TextInput style={[styles.input, { height: 110 }]} multiline value={about} onChangeText={about => setAbout(about)}></TextInput>
+        <Text style={styles.label}>Número de Whatsapp</Text>
+        <TextInputMask style={styles.input} type={'custom'} options={{ maskType: 'BRL', mask: '(99) 9 9999-9999'}} value={whatsappNumber} onChangeText={whatsappNumber => setWhatsappNumber(whatsappNumber)}></TextInputMask>
+        <Text style={styles.label}>Fotos</Text>
+        <View style={styles.uploadedImagesContainer}>
+          {images.map(img => {
+              return (
+                      <View key={img} style={styles.imageContainer}>
+                        <View style={styles.imageRemove} onTouchEnd={() => handleRemoveImage(img)}>
+                          <Feather name="x" size={20} color="#FF669D"></Feather>
+                        </View>
+                        <Image source={{uri: img }} style={styles.uploadedImage}></Image>
+                      </View>
+              )
+          })}
+        </View>
+        <TouchableOpacity style={styles.imagesInput} onPress={handleSelectImages}>
+          <Feather name="plus" size={24} color="#15B6D6"></Feather>
+        </TouchableOpacity>
+        <View style={{opacity}}>
+          <RectButton style={styles.nextButton} onPress={handleNextStage}>
+            <Text style={styles.nextButtonText}>Próximo</Text>
+          </RectButton>
+        </View>
+      </ScrollView>
+    </OrphanageContextProvider>
   )
 }
 
@@ -136,11 +133,6 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
 
-  comment: {
-    fontSize: 11,
-    color: '#8fa7b3',
-  },
-
   input: {
     backgroundColor: '#fff',
     borderWidth: 1.4,
@@ -153,16 +145,42 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
 
-  uploadedImagesContainer:{
-    flexDirection: "row"
+  uploadedImagesContainer: {
+    flexDirection: "row",
+    marginBottom: 10
   },
 
   uploadedImage:{
-    width: 64,
-    height: 64,
+    width: 56,
+    height: 56,
     borderRadius: 20,
-    marginBottom: 32,
-    marginRight: 8
+    marginTop: 8,
+    marginRight: 8,
+
+    zIndex: 1
+  },
+
+  imageContainer:{
+    position: "relative" 
+  },
+
+  imageRemove: {
+    width: 30,
+    height: 30,
+    right: 8,
+    top: 5,
+    
+    backgroundColor: '#FFFFFF',
+    borderColor: '#D3E2E5',
+    borderBottomLeftRadius: 20,
+    borderTopRightRadius: 20,
+    
+    justifyContent: "center",
+    alignItems: "center",
+
+    position: "absolute",
+
+    zIndex: 2
   },
 
   imagesInput: {
@@ -175,13 +193,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 32,
-  },
-
-  switchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 16,
   },
 
   nextButton: {
